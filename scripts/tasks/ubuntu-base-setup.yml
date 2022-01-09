@@ -1,0 +1,41 @@
+# # # #
+# TASKS: Ubnuntu Base Configuration
+#
+# Autor:   Daniel Grob
+#          dgrob@hm.edu
+#
+# DESC:    This Tasks provides the base configuraiton for Ubuntu hosts.
+#
+# HIST:    220105   Create Script
+#
+# # # #
+
+
+---
+
+- name: "HOST :: Checking current timezone"
+  shell: "timedatectl show | grep \"Timezone\" | cut -d \"=\" -f2"
+  register: current_tz
+
+- name: "HOST :: Updating timezone to europe/berlin"
+  shell: timedatectl set-timezone Europe/Berlin
+  when: current_tz.stdout != "Europe/Berlin"
+
+- name: "ANSIBLE :: Include task 'apt-upgrade.yml'"
+  include_tasks: ./apt-upgrade.yml
+
+- name: "APT :: Install basic tools"
+  apt:
+    name: "{{ packages }}"
+  vars:
+    packages:
+      - lsb-release
+      - mc
+      - net-tools
+      - tree
+      - pip
+
+- name: "PIP :: Install basic tools"
+  pip:
+    name:
+      - jsondiff

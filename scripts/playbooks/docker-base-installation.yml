@@ -1,0 +1,25 @@
+# # # #
+# PLAYBOOK: Docker base installation
+#
+# Autor:   Daniel Grob
+#          dgrob@hm.edu
+#
+# DESC:    This playbook can be used to install the Docker Engine and Docker Compose
+#
+# HIST:    220105   Create Script
+#
+# # # #
+
+---
+
+- name: INSTALL DOCKER-ENGINE AND DOCKER-COMPOSE
+  hosts: all
+  gather_facts: no
+  become: true
+  become_user: root
+
+  tasks:
+
+    - name: "ANSIBLE :: Include task 'docker-base-installation.yml'"
+      include_tasks: ../tasks/docker-base-installation.yml
+

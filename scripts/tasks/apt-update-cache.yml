@@ -1,0 +1,21 @@
+# # # #
+# TASKS: APT Repository Cache Update
+#
+# Autor:   Daniel Grob
+#          dgrob@hm.edu
+#
+# DESC:    This task updates the cache of the apt repository
+#
+# HIST:    220105   Create Script
+#
+# # # #
+
+
+---
+
+- name: "APT :: Update repository cache"
+  apt:
+    update_cache: true
+    cache_valid_time: 3600
+    force_apt_get: true
+

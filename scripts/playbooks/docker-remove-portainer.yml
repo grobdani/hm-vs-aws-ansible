@@ -1,0 +1,37 @@
+# # # #
+# PLAYBOOK: Remove Portainer in a Docker-Swarm-Cluster
+#
+# Autor:   Daniel Grob
+#          dgrob@hm.edu
+#
+# DESC:    This playbook can be used to remove the Portainer stack in a Docker-Swarm-Cluster
+#
+# HIST:    220105   Create Script
+#
+# # # #
+
+
+---
+
+- name: REMOVE PORTAINER IN DOCKER-SWARM CLUSTER
+  hosts: masters
+  gather_facts: no
+  become: true
+  become_user: root
+
+  tasks:
+   
+    - name: "DOCKER :: Remove Portainer stack"
+      docker_stack:
+        name: portainer
+        state: absent
+      when: "inventory_hostname in groups['masters']"
+
+    - name: "HOST :: Waiting for full stack delete"
+      pause:
+        seconds: 10
+
+    - name: "DOCKER :: Remove Portainer volumes"
+      docker_volume:
+        name: portainer_portainer_data
+        state: absent

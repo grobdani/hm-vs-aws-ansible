@@ -1,0 +1,28 @@
+# # # #
+# PLAYBOOK: Deploy Portainer in a Docker-Swarm-Cluster
+#
+# Autor:   Daniel Grob
+#          dgrob@hm.edu
+#
+# DESC:    This playbook can be used to deploy a Portainer stack in a Docker-Swarm-Cluster
+#
+# HIST:    220105   Create Script
+#
+# # # #
+
+---
+- name: DEPLOY PORTAINER IN DOCKER-SWARM CLUSTER
+  hosts: masters
+  gather_facts: no
+  become: true
+  become_user: root
+
+  tasks:
+   
+    - name: "DOCKER :: Deploy Portainer stack"
+      docker_stack:
+        name: portainer
+        state: present
+        compose: /opt/ansible/files/docker/portainer/portainer-agent-stack.yml
+      when: "inventory_hostname in groups['masters']"
+

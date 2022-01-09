@@ -1,0 +1,22 @@
+# # # #
+# TASKS: APT Upgrade
+#
+# Autor:   Daniel Grob
+#          dgrob@hm.edu
+#
+# DESC:    With this tasks all packages of the APT package manager can be ugraded.
+#
+# HIST:    220105   Create Script
+#
+# # # #
+
+
+---
+
+- name: "ANSIBLE :: Include tasks 'apt-update.yml'"
+  include_tasks: apt-update-cache.yml
+
+- name: "APT :: Upgrade all packages"
+  apt:
+    name: "*"
+    state: latest

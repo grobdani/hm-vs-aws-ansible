@@ -1,0 +1,27 @@
+# # # #
+# PLAYBOOK: Ubuntu Docker base installation
+#
+# Autor:   Daniel Grob
+#          dgrob@hm.edu
+#
+# DESC:    This playbook can be used to install the Docker Engine and Docker Compose
+#
+# HIST:    220105   Create Script
+#
+# # # #
+
+---
+
+- name: UBUNTU DOCKER BASE SETUP
+  hosts: all
+  gather_facts: no
+  become: true
+  become_user: root
+
+  tasks:
+
+    - name: "ANSIBLE :: Include task 'ubuntu-base-installation.yml'"
+      include_tasks: ../tasks/ubuntu-base-setup.yml
+
+    - name: "ANSIBLE :: Include task 'docker-base-installation.yml'"
+      include_tasks: ../tasks/docker-base-installation.yml

@@ -1,0 +1,39 @@
+# # # #
+# Main Inventory
+#
+# Autor:   Daniel Grob
+#          dgrob@hm.edu
+#
+# DESC:    Ansible Inventory fuer Onpremise Installationen
+#
+# HIST:    220105   Grundinstalllation
+#
+# # # #
+
+
+# # #
+# All Nodes
+master          ansible_host=172.50.0.186
+worker-1        ansible_host=172.50.0.63
+worker-2        ansible_host=172.50.0.54
+worker-3	ansible_host=172.50.0.59
+worker-4	ansible_host=172.50.0.53
+worker-5	ansible_host=172.50.0.218
+
+# Master-Nodes
+[masters]
+master
+
+# Worker-Nodes
+[workers]
+worker-1
+worker-2
+worker-3
+worker-4
+worker-5
+
+# Setup Python Interpreter for all Hosts
+[all:vars]
+ansible_python_interpreter=/usr/bin/python3
+ansible_ssh_private_key_file=/home/ubuntu/.ssh/vs-key-pair-for-ssh.pem
+

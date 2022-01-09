@@ -1,0 +1,48 @@
+# # # #
+# Variables for the Docker Cluster Chatservice
+#
+# Autor:   Daniel Grob
+#          dgrob@hm.edu
+#
+# HIST:    220105   Create compose file
+#
+# # # #
+
+---
+
+master_node_ip: "172.50.0.186"
+
+# Repository credentials
+repo_username: "hm-vs-team03"
+repo_password: "77wa#MLz2@dham2yLQ^ssJ"
+
+# # # #
+# Settings to deploy the Chatservice stack
+#
+# General
+stack_name: "chatservice"
+stack_timezone: "Europe/Berlin"
+
+# Network
+stack_network_name: "chatservice_network"
+stack_network_subnet: "172.28.0.0/24"
+
+# Service - ActiveMQ
+artemis_version: "2.16-alpine-latest"
+artemis_ip: "172.28.0.2"
+artemis_username: "myuser"
+artemis_password: "otherpassword"
+
+# Service - Redis
+redis_version: "6.2.5-buster"
+redis_ip: "172.28.0.3"
+
+# Service - Userservice
+userservice_version: "v1.0.0"
+userservice_ip: "172.28.0.4"
+
+# Service - Springadvancedjmsserver
+springadvancedjmsserver_version: "v1.0.0"
+springadvancedjmsserver_ip: "172.28.0.5"
+
+

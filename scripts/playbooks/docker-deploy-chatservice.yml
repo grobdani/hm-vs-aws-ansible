@@ -1,0 +1,128 @@
+# # # #
+# PLAYBOOK: Deploy the Chatservice in a Docker-Swarm-Cluster
+#
+# Autor:   Daniel Grob
+#          dgrob@hm.edu
+#
+# DESC:    This playbook can be used to deploy the Chatservice stack in a Docker-Swarm-Cluster
+#
+# HIST:    220105   Create Script
+#
+# # # #
+
+---
+- name: DEPLOY THE CHATSERVICE IN DOCKER-SWARM CLUSTER
+  hosts: masters
+  gather_facts: no
+  become: true
+  become_user: root
+
+  tasks:
+   
+    - name: "ANSIBLE :: Include variables for setting up the Chatservice in the Swarm-Cluster"
+      include_vars: ../../group_vars/docker-cluster-chatservice.yml
+
+    - name: "DOCKER :: Login to the private Repository (repo.grobdani.de)"
+      docker_login:
+        registry: repo.grobdani.de
+        username: "{{ repo_username }}"
+        password: "{{ repo_password }}"
+      when: "inventory_hostname in groups['masters']"
+
+    - name: "DOCKER :: Create Chatservice network"
+      docker_network:
+        name: "{{ stack_network_name }}"
+        driver: overlay
+        ipam_config:
+          - subnet: "{{ stack_network_subnet }}"
+    
+    - name: "DOCKER :: Create ActiveMQ container"
+      docker_swarm_service:
+        hostname: activemq
+        name: "{{ stack_name }}_activemq"
+        image: "vromero/activemq-artemis:{{ artemis_version }}"
+        state: present
+        mode: replicated
+        replicas: 1
+        placement:
+          constraints: [node.role == worker]
+        networks:
+          - name: "{{ stack_network_name }}"
+        publish:
+          - mode: ingress
+            published_port: 61616
+            target_port: 61616
+          - mode: ingress
+            published_port: 8161
+            target_port: 8161
+        env:
+          TZ: "{{ stack_timezone }}"
+          ARTEMIS_USERNAME: "{{ artemis_username }}"
+          ARTEMIS_PASSWORD: "{{ artemis_password }}"
+
+    - name: "DOCKER :: Create Redis container"
+      docker_swarm_service:
+        hostname: redis
+        name: "{{ stack_name }}_redis"
+        image: "redis:{{ redis_version }}"
+        state: present
+        mode: replicated
+        replicas: 1
+        placement:
+          constraints: [node.role == worker]
+        networks:
+          - name: "{{ stack_network_name }}"
+        publish:
+          - mode: ingress
+            published_port: 6379
+            target_port: 6379
+        env:
+          TZ: "{{ stack_timezone }}"
+
+    - name: "DOCKER :: Create Userservice container"
+      docker_swarm_service:
+        hostname: userservice
+        name: "{{ stack_name }}_userservice"
+        image: "repo.grobdani.de/hm/verteilte-systeme/userservice:{{ userservice_version }}"
+        state: present
+        mode: replicated
+        replicas: 1
+        placement:
+          constraints: [node.role == worker]
+        networks:
+          - name: "{{ stack_network_name }}"
+        publish:
+          - mode: ingress
+            published_port: 8080
+            target_port: 8080
+        env:
+          TZ: "{{ stack_timezone }}"
+          REDIS_IP: "{{ master_node_ip }}"
+
+    - name: "DOCKER :: Create Springadvancedjmsserver container"
+      docker_swarm_service:
+        hostname: springadvancedjmsserver
+        name: "{{ stack_name }}_springadvancedjmsserver"
+        image: "repo.grobdani.de/hm/verteilte-systeme/springadvancedjmsserver:{{ springadvancedjmsserver_version }}"
+        state: present
+        mode: replicated
+        replicas: 1
+        placement:
+          constraints: [node.role == worker]
+        networks:
+          - name: "{{ stack_network_name }}"
+        publish:
+          - mode: ingress
+            published_port: 8090
+            target_port: 8090
+        env:
+          TZ: "{{ stack_timezone }}"
+          USERSERVICE_IP: "{{ master_node_ip }}"
+
+          #- name: "DOCKER :: Deploy the Chatservice stack"
+          #docker_stack:
+          #name: chatservice
+          #state: present
+          #compose: /opt/ansible/files/docker/chatservice/chatservice-stack.yml
+          #when: "inventory_hostname in groups['masters']"
+

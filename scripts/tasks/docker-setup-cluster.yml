@@ -1,0 +1,42 @@
+# # # #
+# TASK: Initialize a Docker-Swarm-Cluster
+#
+# Autor:   Daniel Grob
+#          dgrob@hm.edu
+#
+# DESC:    This tasks can be used to create a Docker Swarm cluster
+#
+# HIST:    220105   Create Script
+#
+# # # #
+
+---
+
+- name: "DOCKER :: Initialize a new swarm with default parameters"
+  docker_swarm:
+    state: present
+    advertise_addr:  "{{ ansible_host }}"
+  when: "inventory_hostname in groups['masters']"
+
+- name: "DOCKER :: Get the manager join-token"
+  shell: docker swarm join-token --quiet manager
+  register: manager_token
+  when: "inventory_hostname in groups['masters']"
+
+- name: "DOCKER :: Get the worker join-token"
+  shell: docker swarm join-token --quiet worker
+  register: worker_token
+  when: "inventory_hostname in groups['masters']"
+
+- name: "DOCKER :: Save the token as fact"
+  set_fact: token="{{ worker_token.stdout }}"
+  when: "inventory_hostname in groups['masters']"
+
+- name: "DOCKER :: Add a worker node in the cluster"
+  docker_swarm:
+    state: join
+    advertise_addr:  "{{ ansible_host }}"
+    join_token: "{{ hostvars['master'].token }}"
+    remote_addrs: "{{ hostvars['master'].ansible_host }}"
+  when: "inventory_hostname in groups['workers']"
+

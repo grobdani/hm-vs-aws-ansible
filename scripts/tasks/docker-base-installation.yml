@@ -1,0 +1,63 @@
+# # # #
+# TASKS: Docker base installation
+#
+# Autor:   Daniel Grob
+#          dgrob@hm.edu
+#
+# DESC:    This tasks can be used to install the Docker Engine and Docker Compose
+#
+# HIST:    220105   Create Script
+#
+# # # #
+
+---
+
+- name: "ANSIBLE :: Include tasks 'apt-update-cache.yml'"
+  include_tasks: ./apt-update-cache.yml
+
+- name: "APT :: Installing needed dependencies for Docker"
+  apt:
+    name: "{{ packages }}"
+  vars:
+    packages:
+      - apt-transport-https
+      - ca-certificates
+      - curl
+      - gnupg
+      - lsb-release
+      - python3-pip
+
+- name: "APT :: Adding official Docker GPG key"
+  apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    state: present
+
+- name: "APT :: Adding Docker repository to apt"
+  apt_repository:
+    repo: deb https://download.docker.com/linux/ubuntu bionic stable
+    state: present
+
+- name: "APT :: Installing Docker"
+  apt:
+    name: "{{ packages }}"
+  vars:
+    packages:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+
+- name: "HOST :: Make sure Docker is active"
+  service:
+    name: docker
+    state: started
+    enabled: yes
+
+- name: "PIP :: Installing Docker-Compose"
+  pip:
+    name: docker-compose
+
+- name: "HOST :: Setting up individual folder for Docker in /opt/"
+  file:
+    path: /opt/docker
+    state: directory
+

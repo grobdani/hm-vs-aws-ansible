@@ -1,0 +1,24 @@
+# # # #
+# PLAYBOOK: Initialize a Docker-Swarm-Cluster
+#
+# Autor:   Daniel Grob
+#          dgrob@hm.edu
+#
+# DESC:    This playbook can be used to create a Docker Swarm cluster
+#
+# HIST:    220105   Create Script
+#
+# # # #
+
+---
+
+- name: INITIALIZE A NEW DOCKER-SWARM CLUSTER
+  hosts: all
+  gather_facts: no
+  become: true
+  become_user: root
+
+  tasks:
+
+    - name: "ANSIBLE :: Include tasks 'docker-setup-cluster.yml'"
+      include_tasks: ../tasks/docker-setup-cluster.yml

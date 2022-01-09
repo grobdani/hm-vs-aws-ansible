@@ -1,0 +1,104 @@
+# # # #
+# Docker Compose-File
+#
+# Autor:   Daniel Grob
+#          dgrob@hm.edu
+#
+# HIST:    220105   Create compose file
+#
+# # # #
+
+
+version: "3.9"
+
+services:
+
+  # # # # ACTIVEMQ # # # #
+  activemq:
+    hostname: activemq
+    image: vromero/activemq-artemis:2.16-alpine-latest
+    ports:
+      - "61616:61616"
+      - "8161:8161"
+    environment:
+      - TZ=Europe/Berlin
+      - ARTEMIS_USERNAME=myuser
+      - ARTEMIS_PASSWORD=otherpassword
+    networks:
+      - chatservice_network
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints: [node.role == worker]
+
+  # # # # REDIS # # # #
+  redis:
+    hostname: redis
+    image: redis:6.2.5-buster
+    ports:
+      - "6379:6379"
+    environment:
+      - TZ=Europe/Berlin
+    networks:
+      - chatservice_network
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints: [node.role == worker]
+
+  ubuntu:
+    hostname: ubuntu
+    image: ubuntu:latest
+    command: ["sleep","infinity"]
+    environment:
+      - TZ=Europe/Berlin
+    networks:
+      - chatservice_network
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints: [node.role == worker]
+
+  # # # # REST-Userservice # # # #
+  #userservice:
+  #  hostname: userservice
+  #  image: repo.grobdani.de/hm/verteilte-systeme/userservice:latest
+  #  ports:
+  #    - "8080:8080"
+  #  environment:
+  #    - TZ=${TIMEZONE}
+  #    - REDIS_IP=redis
+  #  depends_on:
+  #    - activemq
+  #    - redis
+  #  networks:
+  #    chatservice_network:
+  #      #ipv4_address: ${USERSERVICE_IP}
+
+  # # # # SPRINGJMSADVANCEDSERVER # # # #
+  #springjmsadvancedserver:
+  #  hostname: springjmsadvancedserver
+  #  image: repo.grobdani.de/hm/verteilte-systeme/springadvancedjmsserver:latest
+  #  ports:
+  #    - "8090:8090"
+  #  environment:
+  #    - TZ=${TIMEZONE}
+  #    - USERSERVICE_IP=userservice
+  #  depends_on:
+  #    - userservice
+  #  networks:
+  #    chatservice_network:
+        #ipv4_address: ${SPRINGJMSADVANCEDSERVER_IP}
+
+# # # NETWORKS # # #
+networks:
+  chatservice_network:
+    driver: overlay
+    attachable: true
+    ipam:
+      config:
+        - subnet: 172.28.0.0/24
+

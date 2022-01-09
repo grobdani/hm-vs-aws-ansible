@@ -1,0 +1,26 @@
+# # # #
+# PLAYBOOK: Ubnuntu Base Configuration
+#
+# Autor:   Daniel Grob
+#          dgrob@hm.edu
+#
+# DESC:    In this playbook, the respective Ubuntu hosts are provided with a basic configuration.
+#
+# HIST:    220105   Create Script
+#
+# # # #
+
+
+---
+
+- name: "BASE SETUP FOR UBUNTU DISTRIBUTIONS"
+  hosts: all
+  gather_facts: no
+  become: true
+  become_user: root
+
+  tasks:
+    
+    - name: "ANSIBLE :: Include tasks 'ubuntu-base-setup.yml'"
+      include_tasks: ../tasks/ubuntu-base-setup.yml
+
